@@ -8,8 +8,12 @@ const addExpense=  async(req,res,next)=>{
     const expense=req.body.expense;
     const desc=req.body.desc;
     const category=req.body.category;
+
+    if(expense== undefined || expense.length === 0 ){
+      return res.status(400).json({success: false, message: 'Parameters missing'})
+  }
   
-    const data= await Expense.create({expense:expense,desc:desc,category:category})
+    const data= await Expense.create({expense:expense,desc:desc,category:category, userId: req.user.id})
     res.status(201).json({newExpenseDetail: data});
     }catch(err){
       res.status(500).json({
@@ -21,7 +25,7 @@ const addExpense=  async(req,res,next)=>{
 
 const getExpense= async(req,res,next)=>{
     try{
-      const expenses = await Expense.findAll();
+      const expenses = await Expense.findAll({ where : { userId: req.user.id}});
       res.status(200).json({allExpenses:expenses});
     }catch(error){
       console.log('Get expense is failing',JSON.stringify(error))
