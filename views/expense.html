@@ -23,7 +23,7 @@
             <option>Movie</option>
         <input type="submit" id="btn" value="submit" >
     </form>
-
+    <div id="message"></div>
     <button id="rzp-button1">Buy Premium</button>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
@@ -117,7 +117,7 @@
 
         }
 
-        document.getElementById('rzp-button1').onclick = async function (e) {
+    document.getElementById('rzp-button1').onclick = async function (e) {
     const token = localStorage.getItem('token')
     const response  = await axios.get('http://localhost:3000/purchase/premiummembership', { headers: {"Authorization" : token} });
     console.log(response);
