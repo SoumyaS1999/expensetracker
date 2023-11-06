@@ -1,6 +1,9 @@
 const Expense=require('../models/expense');
+const User = require('../models/users');
+const seqeulize= require('../util/database');
 
 const addExpense=  async(req,res,next)=>{
+    const t= await seqeulize.transaction();
     try{
       if(!req.body.category){
         throw new Error('Category is mandatory')
@@ -13,11 +16,23 @@ const addExpense=  async(req,res,next)=>{
       return res.status(400).json({success: false, message: 'Parameters missing'})
   }
   
-    const data= await Expense.create({expense:expense,desc:desc,category:category, userId: req.user.id})
-    res.status(201).json({newExpenseDetail: data});
+    const data= await Expense.create({expense:expense,desc:desc,category:category, userId: req.user.id},{ transaction: t})
+    const totalExpense= Number(req.user.totalExpenses) + Number(expense)
+
+    await User.update({
+      totalExpenses: totalExpense
+    },{
+      where: {id: req.user.id},
+      transaction: t
+    }
+    )
+      await t.commit();
+      res.status(201).json({newExpenseDetail: data});
+      
     }catch(err){
+      await t.rollback();
       res.status(500).json({
-        error: err
+       success: false,  error: err
       })
     }
   }
