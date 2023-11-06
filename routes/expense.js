@@ -7,6 +7,8 @@ const userauthentication = require('../middleware/auth')
 
 router.post('/add-expense',userauthentication.authenticate ,usercontroller.addExpense);
 
+router.get('/download', authenticatemiddleware.authenticate, userController.downloadExpenses);
+
 router.get('/get-expense',userauthentication.authenticate ,usercontroller.getExpense);
 
 router.delete('/delete-expense/:id',usercontroller.deleteExpense);
