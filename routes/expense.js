@@ -7,7 +7,7 @@ const userauthentication = require('../middleware/auth')
 
 router.post('/add-expense',userauthentication.authenticate ,usercontroller.addExpense);
 
-router.get('/download', authenticatemiddleware.authenticate, userController.downloadExpenses);
+router.get('/download', userauthentication.authenticate, usercontroller.downloadExpenses);
 
 router.get('/get-expense',userauthentication.authenticate ,usercontroller.getExpense);
 
