@@ -41,8 +41,22 @@ const addExpense=  async(req,res,next)=>{
 
 const getExpense= async(req,res,next)=>{
     try{
-      const expenses = await Expense.findAll({ where : { userId: req.user.id}});
-      res.status(200).json({allExpenses:expenses});
+      const ITEMS_PER_PAGE=2;
+      const page=+ req.params.page || 1;
+      let totalItems= await Expense.count();
+      console.log(totalItems);
+      const expenses = await Expense.findAll({ where : { userId: req.user.id},
+                                              offset: (page -1)* ITEMS_PER_PAGE,
+                                              limit: ITEMS_PER_PAGE});
+      res.status(200).json({allExpenses:expenses,
+                            currentPage: page,
+                            hasNextPage: ITEMS_PER_PAGE* page < totalItems,
+                            nextPage: page +1,
+                            hasPreviousPage: page > 1,
+                            previousPage: page -1,
+                            lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
+                                          
+      });
     }catch(error){
       console.log('Get expense is failing',JSON.stringify(error))
       res.status(500).json({error: error})
@@ -69,7 +83,7 @@ const deleteExpense= async(req,res)=>{
     const IAM_USER_KEY='AKIARQLLWROJ23V4EPOF';
     const IAM_USER_SECRET='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';
 
-    let s3bucket= AWS.S3({
+    let s3bucket= new AWS.S3({
       accessKeyId: IAM_USER_KEY,
       secretAccessKey: IAM_USER_SECRET
     })
@@ -78,29 +92,43 @@ const deleteExpense= async(req,res)=>{
     var params= {
       Bucket: BUCKET_NAME,
       Key: filename,
-      Body: data
+      Body: data,
+      ACL: 'public-read'
     }
+    return new Promise((resolve,reject)=>{
+      s3bucket.upload(params,(err,s3response)=>{
+        if(err){
+          console.log('Something Went Wrong',err)
+          reject(err)
+        }
+        else{
+         // console.log('success',s3response);
+          resolve(s3response.Location);
+        }
+      })
 
-    s3bucket.upload(params,(err,s3response)=>{
-      if(err){
-        console.log('Something Went Wrong',err)
-      }
-      else{
-        console.log('success',s3response);
-      }
     })
+   
   })
 
   }
 
 
   const downloadExpenses =  async (req, res) => {
-    const expenses = req.user.expense;
+    try{
+
+    const expenses = await Expense.findAll({ where : { userId: req.user.id}});
+    const userId= req.user.id;
     console.log(expenses);
     const stringifiedExpenses = JSON.stringify(expenses);
-    const filename ='Expense.txt';
-    const fileURL = uploadToS3(stringifiedExpenses,filename);
+    const filename =`Expense${userId}/${new Date()}.txt`;
+    const fileURL = await uploadToS3(stringifiedExpenses, filename);
+    console.log(fileURL);
     res.status(200).json({fileURL, success: true})
+    }catch{
+      console.log(err)
+      res.status(500).json({fileURL:'', success:'false', err: err})
+    }
 
 };
 

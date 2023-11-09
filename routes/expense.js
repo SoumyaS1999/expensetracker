@@ -9,7 +9,7 @@ router.post('/add-expense',userauthentication.authenticate ,usercontroller.addEx
 
 router.get('/download', userauthentication.authenticate, usercontroller.downloadExpenses);
 
-router.get('/get-expense',userauthentication.authenticate ,usercontroller.getExpense);
+router.get('/get-expense/:page',userauthentication.authenticate ,usercontroller.getExpense);
 
 router.delete('/delete-expense/:id',usercontroller.deleteExpense);
 

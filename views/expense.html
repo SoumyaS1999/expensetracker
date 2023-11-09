@@ -29,6 +29,7 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <ul class ="ul" id="item-list"></ul>
+    <div class="pagination" id="pagination"></div>
 
     <ul id="leaderboard"></ul>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.1/axios.min.js" ></script>
@@ -86,13 +87,15 @@
                 showPremiumuserMessage()
                 showLeaderboard()
             }
-
-            axios.get("http://localhost:3000/expense/get-expense",{ headers: {"Authorization" : token}} )
+            
+            const page=1;
+            axios.get(`http://localhost:3000/expense/get-expense/${page}`,{ headers: {"Authorization" : token}} )
             .then((response)=>{
                 console.log(response)
                 for (var i=0; i<response.data.allExpenses.length;i++){
                     display(response.data.allExpenses[i])
                 }
+                showpagination(response.data);
             })
             .catch((error)=> {
                 console.log(error)
@@ -173,7 +176,7 @@
             //the bcakend is essentially sending a download link
             //  which if we open in browser, the file would download
             var a = document.createElement("a");
-            a.href = response.data.fileUrl;
+            a.href = response.data.fileURL;
             a.download = 'myexpense.csv';
             a.click();
         } else {
@@ -220,6 +223,50 @@
     alert('Something went wrong')
  });
 }
+    function showpagination({
+            currentPage,
+            hasNextPage,
+            nextPage,
+            hasPreviousPage,
+            previousPage,
+            lastPage
+        }){
+            const pagination= document.getElementById('pagination');
+            pagination.innerHTML='';
+
+            if(hasPreviousPage){
+                const btn2=document.createElement('button')
+                btn2.innerHTML= previousPage
+                btn2.addEventListener('click', ()=> getExpenses(previousPage))
+                pagination.appendChild(btn2)
+            }
+             const btn1= document.createElement('button')
+             btn1.innerHTML=`<h3>${currentPage}</h3>`
+             btn1.addEventListener('click', ()=> getExpenses(currentPage))
+             pagination.appendChild(btn1)
+            if(hasNextPage){
+             const btn3= document.createElement('button')
+             btn3.innerHTML= nextPage
+             btn3.addEventListener('click', ()=> getExpenses(nextPage))
+             pagination.appendChild(btn3)
+            }
+        }
+
+        function getExpenses(page){
+            const token = localStorage.getItem('token')
+            axios.get(`http://localhost:3000/expense/get-expense/${page}`,{ headers: {"Authorization" : token}} )
+            .then((response)=>{
+                console.log(response)
+                for (var i=0; i<response.data.allExpenses.length;i++){
+                    display(response.data.allExpenses[i])
+                }
+                showpagination(response.data);
+            })
+            .catch((error)=> {
+                console.log(error)
+            })
+        }
+
 
 
     </script>
