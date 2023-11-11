@@ -1,4 +1,5 @@
 const path = require('path');
+const fs= require('fs');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -10,6 +11,9 @@ const User=require('./models/users.js');
 const Expense=require('./models/expense.js');
 const Order = require('./models/orders.js');
 const Forgotpassword = require('./models/forgotpassword');
+
+const helmet= require('helmet');
+const morgan= require('morgan');
 
 
 
@@ -32,6 +36,11 @@ const expenseRoutes=require('./routes/expense');
 const purchaseRoutes = require('./routes/purchase');
 const premiumFeatureRoutes = require('./routes/premiumFeature');
 const resetPasswordRoutes = require('./routes/resetpassword')
+
+const accessLogStream=fs.createWriteStream(path.join(__dirname,'access.log'),{flags:'a'})
+
+app.use(helmet());
+app.use(morgan('combined',{stream: accessLogStream}));
 
 
 app.use(bodyParser.json({ extended: false }));

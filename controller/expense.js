@@ -64,25 +64,46 @@ const getExpense= async(req,res,next)=>{
   }
 
 const deleteExpense= async(req,res)=>{
+    const t= await seqeulize.transaction();
     try{
-      if(req.params.id=='undefined'){
+      
+      if(req.params.id=='undefined' || req.params.id.length===0){
         console.log('ID is missing')
-        return res.status(400).json({err:'ID is missing'})
+        return res.status(400).json({success: false, err:'ID is missing'})
       }
-    const eId=req.params.id;
-    await Expense.destroy({where:{id: eId}});
-    res.sendStatus(200);
+    const eId=req.params.id
+    const expense= await Expense.findByPk(eId)
+    const expenseamt= expense.expense;
+    const noofrows= await Expense.destroy({where:{id: eId, userId: req.user.id }},{ transaction: t})
+    const totalExpense= Number(req.user.totalExpenses) - Number(expenseamt)
+ 
+
+    await User.update({
+      totalExpenses: totalExpense
+    },{
+      where: {id: req.user.id},
+      transaction: t
+    }
+    )
+      await t.commit();
+
+    if(noofrows===0){
+      return res.status(404).json({success: false, message: 'Expense doesnt belong to the user'})
+    }
+    res.status(200).json({ success: true, message: "Deleted Successfully"});
     }catch(err){
+      await t.rollback();
       console.log(err);
       res.status(500).json(err)
     }
   }
 
-  function uploadToS3(data,filename){
+  async function uploadToS3(data,filename){
     const BUCKET_NAME='expensetrackingapp1999';
     const IAM_USER_KEY='AKIARQLLWROJ23V4EPOF';
     const IAM_USER_SECRET='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';
 
+  
     let s3bucket= new AWS.S3({
       accessKeyId: IAM_USER_KEY,
       secretAccessKey: IAM_USER_SECRET
@@ -92,7 +113,7 @@ const deleteExpense= async(req,res)=>{
     var params= {
       Bucket: BUCKET_NAME,
       Key: filename,
-      Body: data,
+      Body: data ,
       ACL: 'public-read'
     }
     return new Promise((resolve,reject)=>{
@@ -111,7 +132,9 @@ const deleteExpense= async(req,res)=>{
    
   })
 
-  }
+  
+}
+
 
 
   const downloadExpenses =  async (req, res) => {
