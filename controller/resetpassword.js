@@ -2,14 +2,45 @@ const uuid = require('uuid');
 const Sib = require('sib-api-v3-sdk');
 const bcrypt = require('bcrypt');
 
-const dotenv = require('dotenv');
-
-// get config vars
-dotenv.config();
-
-
 const User = require('../models/users');
 const Forgotpassword = require('../models/forgotpassword');
+
+async function sendResetPasswordEmail (id){
+    const Client = Sib.ApiClient.instance;
+    var apiKey = Client.authentications["api-key"];
+    console.log(process.env.API_KEY);
+    apiKey.apiKey = process.env.API_KEY;
+    const sender = {
+      email: "soumya1999crj@gmail.com",
+    };
+  
+    const receivers = [
+      {
+        email: "soumyasarkar136@gmail.com",
+      },
+    ];
+  
+    const transEmailApi = new Sib.TransactionalEmailsApi();
+  
+    const msg = {
+      sender,
+      to: receivers,
+      subject: "Reset Password",
+      text: "Reset your password",
+      htmlContent: `<a href="http://51.20.76.161:3000/password/resetpassword/${id}">Reset password</a>`,
+    };
+  
+    return transEmailApi
+      .sendTransacEmail(msg)
+      .then((resp) => {
+        console.log("Email sent successfully:", resp);
+        return resp;
+      })
+      .catch((err) => {
+        console.log("Email sending failed:", err);
+        return err;
+    });
+  };
 
 const forgotpassword = async (req, res) => {
     try {
@@ -21,38 +52,9 @@ const forgotpassword = async (req, res) => {
                 .catch(err => {
                     throw new Error(err)
                 })
-                const client = Sib.ApiClient.instance
-                const apikey=client.authentications['api-key']
-                apikey.apikey=process.env.API_KEY
-                const tranEmailApi=new Sib.TransactionalEmailsApi()
+        await sendResetPasswordEmail(id);
+        res.status(201)
             
-                const sender={
-                    email:'soumya1999crj@gmail.com'
-            
-                }
-                const receiver=[
-                    {
-                        email: email,
-                    },
-                ]
-                tranEmailApi.sendTransacEmail({
-                    sender,
-                    to: receiver,
-                    subject:'Expense Tracker Reset Password',
-                    textContent:'Click the Link Below',
-                    htmlContent:`<a href="http://localhost:3000/password/resetpassword/${id}">Reset password</a>`
-                }).then((response) => {
-
-                    // console.log(response[0].statusCode)
-                    // console.log(response[0].headers)
-                    return res.status(response[0].statusCode).json({message: 'Link to reset password sent to your mail ', success: true})
-    
-                })
-                .catch((error) => {
-                    console.log(error);
-                })
-
-
         }else {
             throw new Error('User doesnt exist')
         }
@@ -61,11 +63,7 @@ const forgotpassword = async (req, res) => {
         return res.json({ message: err, sucess: false });
     }
 
-
 }
-
-
-
 
 const resetpassword = (req, res) => {
     const id =  req.params.id;

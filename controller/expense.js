@@ -123,7 +123,7 @@ const deleteExpense= async(req,res)=>{
           reject(err)
         }
         else{
-         // console.log('success',s3response);
+          console.log('success',s3response.Location);
           resolve(s3response.Location);
         }
       })
@@ -146,9 +146,8 @@ const deleteExpense= async(req,res)=>{
     const stringifiedExpenses = JSON.stringify(expenses);
     const filename =`Expense${userId}/${new Date()}.txt`;
     const fileURL = await uploadToS3(stringifiedExpenses, filename);
-    console.log(fileURL);
-    res.status(200).json({fileURL, success: true})
-    }catch{
+    res.status(201).json({fileURL: fileURL, success: true});
+    }catch(err){
       console.log(err)
       res.status(500).json({fileURL:'', success:'false', err: err})
     }

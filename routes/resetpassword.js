@@ -9,6 +9,6 @@ router.get('/updatepassword/:resetpasswordid', resetpasswordController.updatepas
 
 router.get('/resetpassword/:id', resetpasswordController.resetpassword)
 
-router.use('/forgotpassword', resetpasswordController.forgotpassword)
+router.post('/forgotpassword', resetpasswordController.forgotpassword)
 
 module.exports = router;

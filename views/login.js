@@ -9,7 +9,7 @@ function login(event){
         email,
         password
     }
-    axios.post("http://localhost:3000/user/login",loginDetails)
+    axios.post("http://51.20.76.161:3000/user/login",loginDetails)
     .then((response)=>{
         console.log(response)
         if(response.status===200){
