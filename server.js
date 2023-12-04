@@ -1,5 +1,5 @@
 const path = require('path');
-const fs= require('fs');
+//const fs= require('fs');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -11,9 +11,10 @@ const User=require('./models/users.js');
 const Expense=require('./models/expense.js');
 const Order = require('./models/orders.js');
 const Forgotpassword = require('./models/forgotpassword');
+const Download= require('./models/download.js');
 
-const helmet= require('helmet');
-const morgan= require('morgan');
+//const helmet= require('helmet');
+//const morgan= require('morgan');
 
 
 
@@ -37,10 +38,10 @@ const purchaseRoutes = require('./routes/purchase');
 const premiumFeatureRoutes = require('./routes/premiumFeature');
 const resetPasswordRoutes = require('./routes/resetpassword')
 
-const accessLogStream=fs.createWriteStream(path.join(__dirname,'access.log'),{flags:'a'})
+//const accessLogStream=fs.createWriteStream(path.join(__dirname,'access.log'),{flags:'a'})
 
-app.use(helmet());
-app.use(morgan('combined',{stream: accessLogStream}));
+//app.use(helmet());
+//app.use(morgan('combined',{stream: accessLogStream}));
 
 
 app.use(bodyParser.json({ extended: false }));
@@ -52,6 +53,11 @@ app.use('/purchase', purchaseRoutes);
 app.use('/premium', premiumFeatureRoutes);
 app.use('/password', resetPasswordRoutes);
 
+app.use((req,res)=>{
+  console.log(req.url);
+  res.sendFile(path.join(__dirname,`views/${req.url}`));
+})
+
 
 User.hasMany(Expense);
 Expense.belongsTo(User);
@@ -62,11 +68,13 @@ Order.belongsTo(User);
 User.hasMany(Forgotpassword);
 Forgotpassword.belongsTo(User);
 
-sequelize
-  .sync()
+User.hasMany(Download);
+Download.belongsTo(User);
+
+sequelize.sync()
   .then(result => {
     // console.log(result);
-    app.listen(4000);
+    app.listen(3000);
   })
   .catch(err => {
     console.log(err);

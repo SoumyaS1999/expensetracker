@@ -18,7 +18,7 @@
             align-items: center;
             justify-content: center;
             min-height: 500px;
-            min-width: 400px;
+            min-width: 300px;
             background: linear-gradient(90deg, #5D54A4, #7C78B8);	
             color: aliceblue;
         }
@@ -34,7 +34,7 @@
             float:left;
             align-items: center;
             min-height: 500px;
-            min-width: 400px;
+            min-width: 300px;
             background: linear-gradient(90deg, #5D54A4, #7C78B8);	
             color: aliceblue;
             text-align: center;
@@ -45,8 +45,8 @@
         }
         .pagination{
             color:aliceblue;
-            margin-top: 80%;
-            margin-left: 45%;
+            margin-top: 50%;
+            margin-left: 40%;
         }
         .submit{
             background: #fff;
@@ -59,12 +59,12 @@
             font-weight: 700;
             display: flex;
             align-items: center;
-            width: 30%;
+            width: 40%;
             color: #4C489D;
             box-shadow: 0px 2px 2px #5C5696;
             cursor: pointer;
             transition: .2s;
-            margin-left: 35%;
+            margin-left: 30%;
         }
         .delete{
             background: #fff;
@@ -87,7 +87,7 @@
             float:left;
             align-items: center;
             min-height: 500px;
-            min-width: 400px;
+            min-width: 250px;
             background: linear-gradient(90deg, #5D54A4, #7C78B8);	
             color: aliceblue;
 
@@ -124,13 +124,24 @@
             font-weight: 700;
             display: flex;
             align-items: center;
-            width: 100%;
+            width: 40%;
             color: #4C489D;
             box-shadow: 0px 2px 2px #5C5696;
             cursor: pointer;
             transition: .2s;
-            margin-left: 35%;
+            margin-left: 30%;
 
+        }
+        .files{
+            align-items: center;
+            min-height: 500px;
+            min-width: 250px;
+            background: linear-gradient(90deg, #5D54A4, #7C78B8);	
+            color: aliceblue;
+            text-align: center;
+        }
+        a{
+            color: aliceblue;
         }
 
     </style>
@@ -158,23 +169,35 @@
             <option>Movie</option>
         <input class="submit" type="submit" id="btn" value="submit" >
     </form>
+    <div class="Premium">
+        <button class="Premiumbtn" id="rzp-button1">Buy Premium</button>
+        
+        </div>
 </div>
     </div>
     
     <div class="expense">
     <h3 class="header">Expense List</h3><br>
     <ul class ="ul" id="item-list"></ul>
-    <div class="pagination" id="pagination"></div>
-    <button class="submit" onclick="download()" id="downloadexpense">Download File</button>
+    <div class="pagination">
+    <ul class ="ul" id="pagination"></ul>
     </div>
+    <button class="submit" onclick="download()" id="downloadexpense">Download File</button>
+    
+    </div>
+
+    <div class="files">
+        <h3 class="header">Downloaded Files</h3>
+        <ul class ="ul" id="file-list"></ul>
+    </div>
+
     <div class="leaderboard">  
     <div id="message"></div>
     <ul class ="ul" id="leaderboard"></ul>
     </div>
-    <div class="Premium">
-    <button class="Premiumbtn" id="rzp-button1">Buy Premium</button>
+    
     </div>
-    </div>
+    
     
     
 

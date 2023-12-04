@@ -11,7 +11,7 @@ function signup(event){
         email,
         password
     }
-    axios.post("http://51.20.76.161:3000/user/signup",signupDetails)
+    axios.post("http://localhost:3000/user/signup",signupDetails)
     .then((response)=>{
         console.log(response)
         if(response.status===201){

@@ -13,7 +13,7 @@ function addExpense(event){
     }
 
     const token  = localStorage.getItem('token')
-    axios.post("http://51.20.76.161:3000/expense/add-expense",obj, { headers: {"Authorization" : token} })
+    axios.post("http://localhost:3000/expense/add-expense",obj, { headers: {"Authorization" : token} })
     .then((response)=>{
         display(response.data.newExpenseDetail)
         console.log(response)
@@ -52,7 +52,7 @@ function addExpense(event){
         }
         
         const page=1;
-        axios.get(`http://51.20.76.161:3000/expense/get-expense/${page}`,{ headers: {"Authorization" : token}} )
+        axios.get(`http://localhost:3000/expense/get-expense/${page}`,{ headers: {"Authorization" : token}} )
         .then((response)=>{
             console.log(response)
             for (var i=0; i<response.data.allExpenses.length;i++){
@@ -63,7 +63,27 @@ function addExpense(event){
         .catch((error)=> {
             console.log(error)
         })
+
+
     })
+    window.addEventListener("DOMContentLoaded",()=>{
+
+        const token  = localStorage.getItem('token')
+        const decodeToken = parseJwt(token)
+        console.log(decodeToken)
+
+    axios.get(`http://localhost:3000/expense/download-expense`,{ headers: {"Authorization" : token}} )
+        .then((response)=>{
+            console.log(response)
+            for (var i=0; i<response.data.allExpenses.length;i++){
+                displayfile(response.data.allExpenses[i])
+            }
+            
+        }).catch((error)=> {
+            console.log(error)
+        })
+    })
+
 function display(obj){
 
 
@@ -78,12 +98,23 @@ function display(obj){
                         </li>`
     parentElem.innerHTML= parentElem.innerHTML+childElem ;
     }
+
+function displayfile(obj){
+    
+
+    const parentElem= document.getElementById('file-list');
+    const childElem = `<li id=${obj.id}> Filename: ${obj.name} - <a href='${obj.link}'>Download Link</a>
+                        
+                        </li>`
+    parentElem.innerHTML= parentElem.innerHTML+childElem ;
+
+}
     
 
     //delete button
     function deleteExpense(e,expenseId){
         const token = localStorage.getItem('token')
-        axios.delete(`http://51.20.76.161:3000/expense/delete-expense/${expenseId}`, { headers: {"Authorization" : token} })
+        axios.delete(`http://localhost:3000/expense/delete-expense/${expenseId}`, { headers: {"Authorization" : token} })
         .then((response)=>{
             removeUserfromscreen(expenseId)
         })
@@ -111,7 +142,7 @@ function display(obj){
         inputElement.value = 'Show Leaderboard'
         inputElement.onclick = async() => {
             const token = localStorage.getItem('token')
-            const userLeaderBoardArray = await axios.get('http://51.20.76.161:3000/premium/showLeaderBoard', { headers: {"Authorization" : token} })
+            const userLeaderBoardArray = await axios.get('http://localhost:3000/premium/showLeaderBoard', { headers: {"Authorization" : token} })
             console.log(userLeaderBoardArray)
 
             var leaderboardElem = document.getElementById('leaderboard')
@@ -136,7 +167,7 @@ function display(obj){
     }
 function download(){
 const token = localStorage.getItem('token')
-axios.get('http://51.20.76.161:3000/expense/download',{ headers: {"Authorization" : token}} )
+axios.get('http://localhost:3000/expense/download',{ headers: {"Authorization" : token}} )
 .then((response) => {
     if(response.status === 201){
         var a = document.createElement("a");
@@ -157,7 +188,7 @@ axios.get('http://51.20.76.161:3000/expense/download',{ headers: {"Authorization
 
 document.getElementById('rzp-button1').onclick = async function (e) {
 const token = localStorage.getItem('token')
-const response  = await axios.get('http://51.20.76.161:3000/purchase/premiummembership', { headers: {"Authorization" : token} });
+const response  = await axios.get('http://localhost:3000/purchase/premiummembership', { headers: {"Authorization" : token} });
 console.log(response);
 var options =
 {
@@ -165,7 +196,7 @@ var options =
  "order_id": response.data.order.id,
  
  "handler": async function (response) {
-    const res = await axios.post('http://51.20.76.161:3000/purchase/updatetransactionstatus',{
+    const res = await axios.post('http://localhost:3000/purchase/updatetransactionstatus',{
          order_id: options.order_id,
          payment_id: response.razorpay_payment_id,
      }, { headers: {"Authorization" : token} })
@@ -221,7 +252,7 @@ function showpagination({
         const token = localStorage.getItem('token')
         const parentElem= document.getElementById('item-list');
         parentElem.innerHTML='';
-        axios.get(`http://51.20.76.161:3000/expense/get-expense/${page}`,{ headers: {"Authorization" : token}} )
+        axios.get(`http://localhost:3000/expense/get-expense/${page}`,{ headers: {"Authorization" : token}} )
         .then((response)=>{
             console.log(response)
             for (var i=0; i<response.data.allExpenses.length;i++){

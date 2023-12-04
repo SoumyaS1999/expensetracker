@@ -27,7 +27,7 @@ async function sendResetPasswordEmail (id){
       to: receivers,
       subject: "Reset Password",
       text: "Reset your password",
-      htmlContent: `<a href="http://51.20.76.161:3000/password/resetpassword/${id}">Reset password</a>`,
+      htmlContent: `<a href="http://localhost:3000/password/resetpassword/${id}">Reset password</a>`,
     };
   
     return transEmailApi
